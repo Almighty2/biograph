@@ -1,0 +1,5804 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/users/register": {
+      "post": {
+        "operationId": "UtilisateurController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Compte créé avec succès"
+          },
+          "409": {
+            "description": "Email déjà utilisé"
+          }
+        },
+        "summary": "Créer un compte utilisateur",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/login": {
+      "post": {
+        "operationId": "UtilisateurController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie, retourne un token"
+          },
+          "401": {
+            "description": "Identifiants invalides"
+          }
+        },
+        "summary": "Se connecter",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/verify-account": {
+      "post": {
+        "operationId": "UtilisateurController_verifyAccount",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compte vérifié avec succès"
+          },
+          "400": {
+            "description": "Token invalide ou expiré"
+          }
+        },
+        "summary": "Vérifier le compte via token reçu par email",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UtilisateurController_verifyAccounts",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compte vérifié avec succès"
+          },
+          "400": {
+            "description": "Token invalide ou expiré"
+          }
+        },
+        "summary": "Vérifier le compte via token reçu par email",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/resend-verification": {
+      "post": {
+        "operationId": "UtilisateurController_resendVerification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email renvoyé si le compte existe"
+          }
+        },
+        "summary": "Renvoyer l'email de vérification",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/logout/{id}": {
+      "post": {
+        "operationId": "UtilisateurController_logout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'utilisateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Se déconnecter",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/forgot-password": {
+      "post": {
+        "operationId": "UtilisateurController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email envoyé si le compte existe"
+          }
+        },
+        "summary": "Demander un lien de réinitialisation du mot de passe",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/reset-password": {
+      "post": {
+        "operationId": "UtilisateurController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mot de passe réinitialisé"
+          },
+          "400": {
+            "description": "Token invalide ou expiré"
+          }
+        },
+        "summary": "Réinitialiser le mot de passe via token",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UtilisateurController_validateResetToken",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Valider le token de réinitialisation",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/change-password": {
+      "patch": {
+        "operationId": "UtilisateurController_changePassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'utilisateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mot de passe modifié"
+          },
+          "401": {
+            "description": "Mot de passe actuel incorrect"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Changer son mot de passe (connecté)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/all": {
+      "get": {
+        "operationId": "UtilisateurController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister tous les utilisateurs (admin)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "operationId": "UtilisateurController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'utilisateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur trouvé"
+          },
+          "404": {
+            "description": "Utilisateur introuvable"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer un utilisateur par ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "UtilisateurController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'utilisateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profil mis à jour"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour le profil",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UtilisateurController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'utilisateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compte supprimé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un compte (soft delete)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/notifications/system/create": {
+      "post": {
+        "description": "Utilisé par les autres services (Order, Collaboration, AI...) pour notifier l'utilisateur. Ne pas exposer publiquement.",
+        "operationId": "NotificationController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNotificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Système interne] Créer une notification",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/mes-notifications": {
+      "get": {
+        "description": "Retourne aussi le compte des non-lues par type dans les métadonnées.",
+        "operationId": "NotificationController_findAll",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "WRITING_REMINDER",
+                "COLLABORATION_INVITE",
+                "ORDER_UPDATE",
+                "AI_SUGGESTION",
+                "SYSTEM"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "isRead",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister mes notifications avec filtres",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-count": {
+      "get": {
+        "description": "Idéal pour afficher le badge de notifications dans l'UI.",
+        "operationId": "NotificationController_countUnread",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Compter les notifications non lues (total + détail par type)",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/mark-read": {
+      "patch": {
+        "operationId": "NotificationController_markAsRead",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkReadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notifications marquées comme lues"
+          },
+          "403": {
+            "description": "Une ou plusieurs notifications ne vous appartiennent pas"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Marquer des notifications spécifiques comme lues",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/mark-all-read": {
+      "patch": {
+        "operationId": "NotificationController_markAllAsRead",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "WRITING_REMINDER",
+                "COLLABORATION_INVITE",
+                "ORDER_UPDATE",
+                "AI_SUGGESTION",
+                "SYSTEM"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Marquer toutes les notifications comme lues (filtre optionnel par type)",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read": {
+      "delete": {
+        "operationId": "NotificationController_removeAllRead",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer toutes les notifications déjà lues",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notificationId}": {
+      "delete": {
+        "operationId": "NotificationController_remove",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une notification",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/reminders": {
+      "post": {
+        "description": "\nFréquences disponibles : DAILY · EVERY_2_DAYS · WEEKLY\nHeure au format HH:MM (ex: 09:00)\nbookId optionnel — si absent, rappel global pour tous les livres en cours\n    ",
+        "operationId": "NotificationController_createReminder",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWritingReminderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer un rappel d'écriture",
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "get": {
+        "operationId": "NotificationController_findAllReminders",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister mes rappels d'écriture (avec infos du livre associé)",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/reminders/{reminderId}": {
+      "patch": {
+        "operationId": "NotificationController_updateReminder",
+        "parameters": [
+          {
+            "name": "reminderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWritingReminderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifier un rappel (fréquence, heure, actif/inactif)",
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "delete": {
+        "operationId": "NotificationController_removeReminder",
+        "parameters": [
+          {
+            "name": "reminderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un rappel d'écriture",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/reminders/{reminderId}/toggle": {
+      "patch": {
+        "operationId": "NotificationController_toggleReminder",
+        "parameters": [
+          {
+            "name": "reminderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activer / désactiver un rappel d'écriture",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/books/create": {
+      "post": {
+        "operationId": "BookController_create",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Livre créé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer un nouveau livre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/list": {
+      "get": {
+        "operationId": "BookController_findAll",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister tous les livres de l'utilisateur",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/share/{token}": {
+      "get": {
+        "operationId": "BookController_accessByShareToken",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "description": "Token de partage",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Accéder à un livre via lien de partage",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/slug/{slug}": {
+      "get": {
+        "operationId": "BookController_findBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Slug du livre",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer un livre par son slug",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}": {
+      "get": {
+        "operationId": "BookController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer un livre par ID (avec chapitres, TDM, collaborateurs)",
+        "tags": [
+          "Books"
+        ]
+      },
+      "patch": {
+        "operationId": "BookController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBookDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour un livre",
+        "tags": [
+          "Books"
+        ]
+      },
+      "delete": {
+        "operationId": "BookController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un livre (soft delete)",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/publish": {
+      "patch": {
+        "operationId": "BookController_publish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Publier un livre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/archive": {
+      "patch": {
+        "operationId": "BookController_archive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archiver un livre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/visibility": {
+      "patch": {
+        "operationId": "BookController_updateVisibility",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVisibilityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Changer la visibilité du livre (génère un lien de partage si RESTRICTED)",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/chapters": {
+      "post": {
+        "operationId": "BookController_createChapter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du livre",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChapterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajouter un chapitre au livre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/chapters/{chapterId}": {
+      "patch": {
+        "operationId": "BookController_updateChapter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du livre",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChapterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour un chapitre",
+        "tags": [
+          "Books"
+        ]
+      },
+      "delete": {
+        "operationId": "BookController_deleteChapter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un chapitre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/chapters/2/reorder": {
+      "patch": {
+        "operationId": "BookController_reorderChapters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Réordonner les chapitres",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/chapters/{chapterId}/images": {
+      "post": {
+        "operationId": "BookController_createChapterImage",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "description": "ID du livre",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "description": "ID du chapitre",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChapterImageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Image ajoutée"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Livre ou chapitre introuvable"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajouter une image à un chapitre",
+        "tags": [
+          "Books"
+        ]
+      },
+      "get": {
+        "operationId": "BookController_findAllChapterImage",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister toutes les images d'un chapitre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/chapters/{chapterId}/images/reorder": {
+      "patch": {
+        "operationId": "BookController_reorderChapterImage",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Réordonner les images du chapitre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/chapters/{chapterId}/images/{imageId}": {
+      "patch": {
+        "operationId": "BookController_updateChapterImage",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "imageId",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'image",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChapterImageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image mise à jour"
+          },
+          "404": {
+            "description": "Image introuvable"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour une image (légende, position, alt text)",
+        "tags": [
+          "Books"
+        ]
+      },
+      "delete": {
+        "operationId": "BookController_removeChapterImage",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "imageId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image supprimée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une image d'un chapitre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/chapters/{chapterId}/sub-chapters": {
+      "post": {
+        "operationId": "BookController_createSubChapter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubChapterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajouter un sous-chapitre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/chapters/{chapterId}/sub-chapters/{subChapterId}": {
+      "patch": {
+        "operationId": "BookController_updateSubChapter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subChapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubChapterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour un sous-chapitre",
+        "tags": [
+          "Books"
+        ]
+      },
+      "delete": {
+        "operationId": "BookController_deleteSubChapter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subChapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un sous-chapitre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/collaborators": {
+      "get": {
+        "operationId": "BookController_getCollaborators",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister les collaborateurs du livre",
+        "tags": [
+          "Books"
+        ]
+      },
+      "post": {
+        "operationId": "BookController_inviteCollaborator",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteCollaboratorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Inviter un collaborateur par email",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/collaborators/{collaboratorId}/role": {
+      "patch": {
+        "operationId": "BookController_updateCollaboratorRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "collaboratorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCollaboratorRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Changer le rôle d'un collaborateur",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/collaborators/{collaboratorId}": {
+      "delete": {
+        "operationId": "BookController_removeCollaborator",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "collaboratorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retirer un collaborateur",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/versions": {
+      "get": {
+        "operationId": "BookController_getVersions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister les versions sauvegardées",
+        "tags": [
+          "Books"
+        ]
+      },
+      "post": {
+        "operationId": "BookController_createVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVersionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sauvegarder une version (snapshot)",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/versions/{versionId}/restore": {
+      "post": {
+        "operationId": "BookController_restoreVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "versionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restaurer une version antérieure",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/exports": {
+      "get": {
+        "operationId": "BookController_getExports",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister les exports d'un livre",
+        "tags": [
+          "Books"
+        ]
+      },
+      "post": {
+        "operationId": "BookController_requestExport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportBookDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lancer un export (PDF, EPUB, DOCX)",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/table-of-contents": {
+      "post": {
+        "operationId": "BookController_generateTableOfContents",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Générer / régénérer la table des matières",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/tags": {
+      "post": {
+        "operationId": "BookController_addTags",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTagsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajouter des tags au livre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/tags/{tagId}": {
+      "delete": {
+        "operationId": "BookController_removeTag",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tagId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retirer un tag du livre",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/user/favorites": {
+      "get": {
+        "operationId": "BookController_getFavorites",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister les favoris de l'utilisateur",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/favorites": {
+      "post": {
+        "operationId": "BookController_addFavorite",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddFavoriteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajouter un livre (ou chapitre) aux favoris",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{id}/favorites/{favoriteId}": {
+      "delete": {
+        "operationId": "BookController_removeFavorite",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "favoriteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retirer des favoris",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/ai/suggestions": {
+      "post": {
+        "description": "\n        Types disponibles :\n        - BOOK_PLAN → plan complet du livre\n        - CHAPTER_DRAFT → brouillon d'un chapitre\n        - SENTENCE_SUGGESTION → suggestion de phrase/passage\n        - CORRECTION → correction grammaticale et stylistique\n        - NARRATIVE_ADVICE → conseil narratif\n        - COVER_PROMPT → prompt pour génération de couverture\n    ",
+        "operationId": "AiController_createSuggestion",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAiSuggestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Suggestion générée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Générer une suggestion IA",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/books/{bookId}/ai/suggestions": {
+      "get": {
+        "operationId": "AiController_getSuggestionsForBook",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister toutes les suggestions IA d'un livre",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/books/{bookId}/chapters/{chapterId}/ai/suggestions": {
+      "get": {
+        "operationId": "AiController_getSuggestionsForChapter",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister les suggestions IA d'un chapitre",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/ai/suggestions/{suggestionId}/accept": {
+      "patch": {
+        "operationId": "AiController_acceptOrReject",
+        "parameters": [
+          {
+            "name": "suggestionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptSuggestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Accepter ou refuser une suggestion IA",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/ai/suggestions/{suggestionId}": {
+      "delete": {
+        "operationId": "AiController_deleteSuggestion",
+        "parameters": [
+          {
+            "name": "suggestionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une suggestion IA",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/books/{bookId}/covers/generate": {
+      "post": {
+        "description": "Styles disponibles : vintage, moderne, minimaliste, aquarelle, africain, illustré",
+        "operationId": "AiController_generateCover",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCoverGenerationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Couverture générée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Générer une couverture IA pour un livre",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/books/{bookId}/covers": {
+      "get": {
+        "operationId": "AiController_getCoversForBook",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister toutes les couvertures générées pour un livre",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/books/{bookId}/covers/{coverId}/select": {
+      "patch": {
+        "description": "Désélectionne automatiquement les autres et met à jour coverImageUrl du livre",
+        "operationId": "AiController_selectCover",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "coverId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sélectionner une couverture comme couverture officielle du livre",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/ai-suggestions/books/{bookId}/covers/{coverId}": {
+      "delete": {
+        "operationId": "AiController_deleteCover",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "coverId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une couverture générée",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/api/v1/media/books/{bookId}/media": {
+      "post": {
+        "description": "\nTypes disponibles :\n- AUDIO_NARRATION → narration audio du livre avec voix de synthèse\n- VIDEO_STORY → vidéo narrative générée depuis le contenu du livre\n    ",
+        "operationId": "MediaController_create",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMediaProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Projet créé, génération en file d'attente"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer un projet audio ou vidéo pour un livre",
+        "tags": [
+          "Media Projects"
+        ]
+      },
+      "get": {
+        "operationId": "MediaController_findAllForBook",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister tous les projets multimédia d'un livre",
+        "tags": [
+          "Media Projects"
+        ]
+      }
+    },
+    "/api/v1/media/media/my-projects": {
+      "get": {
+        "operationId": "MediaController_findAllForUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister tous mes projets multimédia (tous livres confondus)",
+        "tags": [
+          "Media Projects"
+        ]
+      }
+    },
+    "/api/v1/media/media/{projectId}": {
+      "get": {
+        "operationId": "MediaController_findOne",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Détail d'un projet multimédia (avec statut et fileUrl)",
+        "tags": [
+          "Media Projects"
+        ]
+      },
+      "patch": {
+        "operationId": "MediaController_update",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifier un projet multimédia (titre, voix, musique)",
+        "tags": [
+          "Media Projects"
+        ]
+      },
+      "delete": {
+        "operationId": "MediaController_remove",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un projet multimédia",
+        "tags": [
+          "Media Projects"
+        ]
+      }
+    },
+    "/api/v1/media/media/{projectId}/regenerate": {
+      "post": {
+        "operationId": "MediaController_regenerate",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Relancer la génération d'un projet (en cas d'échec ou modification)",
+        "tags": [
+          "Media Projects"
+        ]
+      }
+    },
+    "/api/v1/media/media/{projectId}/status": {
+      "patch": {
+        "description": "Appelé par le worker BullMQ une fois la génération terminée ou échouée",
+        "operationId": "MediaController_updateStatus",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Webhook interne] Mettre à jour le statut après génération par le worker",
+        "tags": [
+          "Media Projects"
+        ]
+      }
+    },
+    "/api/v1/orders/simulate-price": {
+      "get": {
+        "description": "Calcule le prix en fonction du format, type de couverture et nombre d'exemplaires",
+        "operationId": "OrderController_simulatePrice",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "printFormat",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "A4",
+                "A5",
+                "POCKET",
+                "SQUARE"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "coverType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PAPERBACK",
+                "HARDCOVER"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "copies",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Simuler le prix d'une commande avant de la passer",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/create": {
+      "post": {
+        "description": "\n        Le prix est calculé automatiquement côté serveur.\n        Grille tarifaire :\n        - A4 : 25 XOF/page · A5 : 18 XOF/page · POCKET : 15 XOF/page · SQUARE : 22 XOF/page\n        - Supplément couverture rigide (HARDCOVER) : +1 500 XOF\n            ",
+        "operationId": "OrderController_create",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Commande créée, en attente de paiement"
+          },
+          "400": {
+            "description": "Livre sans pages ou données invalides"
+          },
+          "404": {
+            "description": "Livre introuvable"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Passer une commande d'impression",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/my-orders": {
+      "get": {
+        "operationId": "OrderController_findAllForUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister mes commandes (historique complet)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/admin/all": {
+      "get": {
+        "operationId": "OrderController_findAllAdmin",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "PRINTING",
+                "SHIPPED",
+                "DELIVERED",
+                "CANCELLED",
+                "REFUNDED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Admin] Lister toutes les commandes avec filtre par statut",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}": {
+      "get": {
+        "operationId": "OrderController_findOne",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commande trouvée"
+          },
+          "404": {
+            "description": "Commande introuvable"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Détail d'une commande avec historique des événements",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}/confirm-payment": {
+      "post": {
+        "description": "Passerelles disponibles : STRIPE · FLUTTERWAVE · MOBILE_MONEY",
+        "operationId": "OrderController_confirmPayment",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement confirmé, statut → CONFIRMED"
+          },
+          "400": {
+            "description": "Commande déjà confirmée ou annulée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirmer le paiement d'une commande",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}/status": {
+      "patch": {
+        "description": "\nCycle de vie autorisé :\nPENDING → CONFIRMED → PRINTING → SHIPPED → DELIVERED\nPENDING ou CONFIRMED → CANCELLED\nDELIVERED → REFUNDED\n\nLe code de suivi est obligatoire pour passer au statut SHIPPED.\n    ",
+        "operationId": "OrderController_updateStatus",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Statut mis à jour"
+          },
+          "400": {
+            "description": "Transition de statut invalide"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Admin] Mettre à jour le statut d'une commande",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}/cancel": {
+      "patch": {
+        "operationId": "OrderController_cancel",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Commande annulée"
+          },
+          "400": {
+            "description": "Commande non annulable dans cet état"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Annuler une commande (possible uniquement en statut PENDING ou CONFIRMED)",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}/events": {
+      "get": {
+        "operationId": "OrderController_getEvents",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Historique complet des événements d'une commande",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/v1/blockchain/anchors": {
+      "post": {
+        "description": "\n        Processus :\n        1. Calcule un hash SHA256 du contenu de chaque livre (chapitres + sous-chapitres)\n        2. Crée l'entrée BlockchainAnchor en base\n        3. Soumet la transaction au réseau blockchain via un worker\n        4. La confirmation (txHash) arrive ensuite via le webhook PATCH /anchors/:id/confirm\n\n        Réseaux disponibles : polygon (défaut) · ethereum · bsc · tezos\n    ",
+        "operationId": "BlockchainController_create",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnchorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ancrage créé, soumission blockchain en attente"
+          },
+          "404": {
+            "description": "Un ou plusieurs livres introuvables"
+          },
+          "409": {
+            "description": "Livre déjà ancré ou contenu identique déjà ancré"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ancrer un ou plusieurs livres sur la blockchain",
+        "tags": [
+          "Blockchain"
+        ]
+      },
+      "get": {
+        "operationId": "BlockchainController_findAll",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister mes ancrages blockchain",
+        "tags": [
+          "Blockchain"
+        ]
+      }
+    },
+    "/api/v1/blockchain/anchors/{anchorId}": {
+      "get": {
+        "operationId": "BlockchainController_findOne",
+        "parameters": [
+          {
+            "name": "anchorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Détail d'un ancrage (avec lien explorateur blockchain si confirmé)",
+        "tags": [
+          "Blockchain"
+        ]
+      }
+    },
+    "/api/v1/blockchain/verify/{bookId}": {
+      "get": {
+        "description": "\n        Compare le hash SHA256 actuel du contenu du livre avec celui enregistré lors de l'ancrage.\n        - isIntact: true → le contenu n'a pas été modifié depuis l'ancrage\n        - isIntact: false → le contenu a été modifié après l'ancrage (alerte d'intégrité)\n    ",
+        "operationId": "BlockchainController_verifyIntegrity",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "description": "ID du livre à vérifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Résultat de vérification d'intégrité"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Vérifier l'intégrité d'un livre par rapport à son ancrage",
+        "tags": [
+          "Blockchain"
+        ]
+      }
+    },
+    "/api/v1/blockchain/anchors/{anchorId}/confirm": {
+      "patch": {
+        "description": "Appelé par le worker blockchain une fois la transaction minée. Enregistre le txHash et la date d'ancrage.",
+        "operationId": "BlockchainController_confirmTransaction",
+        "parameters": [
+          {
+            "name": "anchorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmAnchorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ancrage confirmé avec txHash"
+          },
+          "409": {
+            "description": "Ancrage déjà confirmé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Webhook interne] Confirmer la transaction blockchain après soumission on-chain",
+        "tags": [
+          "Blockchain"
+        ]
+      }
+    },
+    "/api/v1/blockchain/anchors/{anchorId}/books/{bookId}": {
+      "delete": {
+        "description": "Impossible si l'ancrage est déjà confirmé on-chain (txHash présent).",
+        "operationId": "BlockchainController_detachBook",
+        "parameters": [
+          {
+            "name": "anchorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Livre détaché de l'ancrage"
+          },
+          "400": {
+            "description": "Ancrage déjà confirmé, détachement impossible"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Détacher un livre d'un ancrage non encore confirmé",
+        "tags": [
+          "Blockchain"
+        ]
+      }
+    },
+    "/api/v1/writing-stats/upsert": {
+      "post": {
+        "description": "\n            Une seule entrée par utilisateur + livre + jour.\n            Si une entrée existe déjà pour ce jour, les mots et minutes sont additionnés.\n            Date par défaut : aujourd'hui.\n    ",
+        "operationId": "WritingStatController_upsert",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertWritingStatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session enregistrée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enregistrer une session d'écriture (upsert par jour)",
+        "tags": [
+          "Writing Stats"
+        ]
+      }
+    },
+    "/api/v1/writing-stats/summary": {
+      "get": {
+        "description": "\n            Retourne :\n            - Total mots écrits, minutes passées, jours actifs\n            - Moyenne mots/jour et minutes/jour\n            - Meilleur jour (plus de mots écrits)\n            - Streak actuel (jours consécutifs d'écriture)\n    ",
+        "operationId": "WritingStatController_getSummary",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bookId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Résumé des statistiques d'écriture",
+        "tags": [
+          "Writing Stats"
+        ]
+      }
+    },
+    "/api/v1/writing-stats/daily": {
+      "get": {
+        "description": "Retourne une entrée par jour avec mots écrits et minutes passées.",
+        "operationId": "WritingStatController_getDaily",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bookId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Statistiques jour par jour (pour graphique barres / courbe)",
+        "tags": [
+          "Writing Stats"
+        ]
+      }
+    },
+    "/api/v1/writing-stats/by-book": {
+      "get": {
+        "description": "\n            Retourne pour chaque livre :\n            - Total mots écrits et heures passées\n            - Nombre de jours actifs\n            - Moyenne mots par jour\n    ",
+        "operationId": "WritingStatController_getByBook",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Statistiques agrégées par livre",
+        "tags": [
+          "Writing Stats"
+        ]
+      }
+    },
+    "/api/v1/writing-stats/streak": {
+      "get": {
+        "description": "Compte les jours consécutifs où l'utilisateur a écrit au moins 1 mot.",
+        "operationId": "WritingStatController_getStreak",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bookId",
+            "required": false,
+            "in": "query",
+            "description": "Streak spécifique à un livre",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Calculer le streak d'écriture actuel (jours consécutifs)",
+        "tags": [
+          "Writing Stats"
+        ]
+      }
+    },
+    "/api/v1/writing-stats/{statId}": {
+      "delete": {
+        "operationId": "WritingStatController_remove",
+        "parameters": [
+          {
+            "name": "statId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une entrée de statistique",
+        "tags": [
+          "Writing Stats"
+        ]
+      }
+    },
+    "/api/v1/support/threads": {
+      "post": {
+        "description": "Crée le thread ET envoie le premier message en une seule requête.",
+        "operationId": "SupportController_createThread",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateThreadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Discussion créée avec le premier message"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ouvrir une nouvelle discussion de support",
+        "tags": [
+          "Support"
+        ]
+      },
+      "get": {
+        "operationId": "SupportController_findAll",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister mes discussions de support",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/threads/{threadId}": {
+      "get": {
+        "operationId": "SupportController_findOne",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Détail d'une discussion (avec tous les messages)",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/admin/threads": {
+      "get": {
+        "operationId": "SupportController_findAllAdmin",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "OPEN",
+                "IN_PROGRESS",
+                "RESOLVED",
+                "CLOSED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Admin] Lister toutes les discussions avec filtre par statut",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/admin/threads/{threadId}": {
+      "get": {
+        "operationId": "SupportController_findOneAdmin",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Admin] Détail complet d'une discussion",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/admin/threads/{threadId}/status": {
+      "patch": {
+        "description": "\n                Cycle autorisé :\n                OPEN → IN_PROGRESS → RESOLVED → CLOSED\n                RESOLVED ou CLOSED → OPEN (réouverture)\n\n                Si une note est fournie, un message système est automatiquement ajouté au thread.\n    ",
+        "operationId": "SupportController_updateStatus",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateThreadStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Transition de statut invalide"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Admin] Changer le statut d'une discussion",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/threads/{threadId}/messages": {
+      "get": {
+        "operationId": "SupportController_getMessages",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lister les messages d'une discussion (paginé)",
+        "tags": [
+          "Support"
+        ]
+      },
+      "post": {
+        "description": "\n            - Utilisateur → senderType: USER (par défaut)\n            - Agent support → senderType: AGENT\n            - Bot → senderType: BOT (senderId = null)\n\n            Si un agent répond à un thread OPEN, le statut passe automatiquement à IN_PROGRESS.\n            Impossible d'envoyer dans un thread CLOSED (sauf admin).\n    ",
+        "operationId": "SupportController_sendMessage",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Envoyer un message dans une discussion",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/admin/threads/{threadId}/messages": {
+      "post": {
+        "operationId": "SupportController_sendMessageAdmin",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Admin] Envoyer un message en tant qu'agent ou bot",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/threads/{threadId}/messages/{messageId}": {
+      "delete": {
+        "operationId": "SupportController_deleteMessage",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "messageId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer son propre message",
+        "tags": [
+          "Support"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "projet-x-service",
+    "description": "API du projet-x-service",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "customers",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Adresse email de l'utilisateur",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Mot de passe (min 8 caractères)",
+            "example": "Password123!",
+            "minLength": 8
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Nom complet",
+            "example": "Kaboré Moussa"
+          },
+          "language": {
+            "type": "string",
+            "description": "Langue préférée",
+            "example": "fr",
+            "default": "fr"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Fuseau horaire",
+            "example": "Africa/Abidjan",
+            "default": "Africa/Abidjan"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "fullName"
+        ]
+      },
+      "LoginUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email de l'utilisateur",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Mot de passe",
+            "example": "Password123!"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "VerifyAccountDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "token_recu_par_mail"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token reçu par email"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "Nouveau mot de passe",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "Mot de passe actuel",
+            "example": "OldPassword123!"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "Nouveau mot de passe",
+            "example": "NewPassword456!",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "Kaboré Moussa"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Développeur passionné de biographie."
+          },
+          "avatarUrl": {
+            "type": "string",
+            "example": "https://cdn.example.com/avatar.jpg"
+          },
+          "language": {
+            "type": "string",
+            "example": "fr"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Africa/Abidjan"
+          }
+        }
+      },
+      "CreateNotificationDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "ID de l'utilisateur destinataire",
+            "example": "clxUSR001"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "WRITING_REMINDER",
+              "COLLABORATION_INVITE",
+              "ORDER_UPDATE",
+              "AI_SUGGESTION",
+              "SYSTEM"
+            ],
+            "example": "SYSTEM"
+          },
+          "title": {
+            "type": "string",
+            "example": "Votre commande a été expédiée"
+          },
+          "body": {
+            "type": "string",
+            "example": "Votre livre \"Ma vie en CI\" est en route. Code de suivi : CI123456"
+          },
+          "data": {
+            "type": "object",
+            "description": "Données contextuelles selon le type de notification",
+            "examples": {
+              "order_update": {
+                "value": {
+                  "orderId": "clxORD001",
+                  "status": "SHIPPED",
+                  "trackingCode": "CI123456"
+                }
+              },
+              "collaboration_invite": {
+                "value": {
+                  "bookId": "clxBOOK001",
+                  "bookTitle": "Ma vie",
+                  "invitedBy": "Jean Dupont"
+                }
+              },
+              "ai_suggestion": {
+                "value": {
+                  "suggestionId": "clxAI001",
+                  "bookId": "clxBOOK001",
+                  "type": "CHAPTER_DRAFT"
+                }
+              },
+              "writing_reminder": {
+                "value": {
+                  "bookId": "clxBOOK001",
+                  "bookTitle": "Ma vie",
+                  "targetWordCount": 50000
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "userId",
+          "type",
+          "title",
+          "body"
+        ]
+      },
+      "MarkReadDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "description": "IDs des notifications à marquer comme lues",
+            "example": [
+              "clxNOT001",
+              "clxNOT002"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "CreateWritingReminderDto": {
+        "type": "object",
+        "properties": {
+          "bookId": {
+            "type": "string",
+            "description": "ID du livre concerné (optionnel — si absent, rappel global)",
+            "example": "clxBOOK001"
+          },
+          "frequency": {
+            "type": "string",
+            "description": "Fréquence du rappel",
+            "enum": [
+              "DAILY",
+              "EVERY_2_DAYS",
+              "WEEKLY"
+            ],
+            "default": "DAILY"
+          },
+          "time": {
+            "type": "string",
+            "description": "Heure du rappel au format HH:MM",
+            "example": "09:00"
+          }
+        },
+        "required": [
+          "time"
+        ]
+      },
+      "UpdateWritingReminderDto": {
+        "type": "object",
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "DAILY",
+              "EVERY_2_DAYS",
+              "WEEKLY"
+            ]
+          },
+          "time": {
+            "type": "string",
+            "example": "20:00"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Activer ou désactiver le rappel",
+            "example": true
+          }
+        }
+      },
+      "CreateBookDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Titre du livre",
+            "example": "Ma vie en Côte d'Ivoire"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Sous-titre",
+            "example": "Une histoire de résilience"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description / résumé",
+            "example": "Ce livre retrace..."
+          },
+          "language": {
+            "type": "string",
+            "description": "Langue du livre",
+            "example": "fr",
+            "default": "fr"
+          },
+          "genre": {
+            "type": "string",
+            "description": "Genre littéraire",
+            "enum": [
+              "AUTOBIOGRAPHY",
+              "BIOGRAPHY",
+              "FAMILY_ARCHIVE",
+              "COMMUNITY_HISTORY",
+              "MEMOIR",
+              "OTHER"
+            ],
+            "default": "AUTOBIOGRAPHY"
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Visibilité du livre",
+            "enum": [
+              "PRIVATE",
+              "RESTRICTED",
+              "PUBLIC"
+            ],
+            "default": "PRIVATE"
+          },
+          "targetWordCount": {
+            "type": "number",
+            "description": "Objectif en nombre de mots",
+            "example": 50000
+          },
+          "targetPageCount": {
+            "type": "number",
+            "description": "Objectif en nombre de pages",
+            "example": 200
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "description": "URL de la couverture",
+            "example": "https://cdn.example.com/cover.jpg"
+          },
+          "coverStyle": {
+            "type": "string",
+            "description": "Style de couverture IA",
+            "example": "vintage"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "UpdateBookDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Ma vie en Côte d'Ivoire"
+          },
+          "subtitle": {
+            "type": "string",
+            "example": "Une histoire de résilience"
+          },
+          "description": {
+            "type": "string",
+            "example": "Ce livre retrace..."
+          },
+          "language": {
+            "type": "string",
+            "example": "fr"
+          },
+          "genre": {
+            "type": "string",
+            "enum": [
+              "AUTOBIOGRAPHY",
+              "BIOGRAPHY",
+              "FAMILY_ARCHIVE",
+              "COMMUNITY_HISTORY",
+              "MEMOIR",
+              "OTHER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "IN_PROGRESS",
+              "REVIEW",
+              "PUBLISHED",
+              "ARCHIVED"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PRIVATE",
+              "RESTRICTED",
+              "PUBLIC"
+            ]
+          },
+          "targetWordCount": {
+            "type": "number",
+            "example": 50000
+          },
+          "targetPageCount": {
+            "type": "number",
+            "example": 200
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "example": "https://cdn.example.com/cover.jpg"
+          },
+          "coverStyle": {
+            "type": "string",
+            "example": "vintage"
+          },
+          "isPremium": {
+            "type": "boolean",
+            "description": "Marquer comme premium",
+            "example": false
+          }
+        }
+      },
+      "UpdateVisibilityDto": {
+        "type": "object",
+        "properties": {
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PRIVATE",
+              "RESTRICTED",
+              "PUBLIC"
+            ]
+          }
+        },
+        "required": [
+          "visibility"
+        ]
+      },
+      "CreateChapterDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Titre du chapitre",
+            "example": "L'enfance au village"
+          },
+          "position": {
+            "type": "number",
+            "description": "Position dans le livre",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "description": "Contenu du chapitre (HTML ou JSON riche)"
+          }
+        },
+        "required": [
+          "title",
+          "position"
+        ]
+      },
+      "UpdateChapterDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "L'enfance au village"
+          },
+          "position": {
+            "type": "number",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "description": "Contenu du chapitre"
+          },
+          "isComplete": {
+            "type": "boolean",
+            "description": "Marquer comme complet",
+            "example": false
+          }
+        }
+      },
+      "CreateChapterImageDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL de l'image",
+            "example": "https://cdn.example.com/photo-famille.jpg"
+          },
+          "caption": {
+            "type": "string",
+            "description": "Légende affichée sous l'image",
+            "example": "Ma famille en 1990 devant la maison"
+          },
+          "altText": {
+            "type": "string",
+            "description": "Texte alternatif pour l'accessibilité",
+            "example": "Photo de famille devant une maison en terre"
+          },
+          "position": {
+            "type": "number",
+            "description": "Position de l'image dans le chapitre",
+            "example": 1
+          },
+          "source": {
+            "type": "string",
+            "description": "Source de l'image",
+            "enum": [
+              "UPLOAD",
+              "AI_GENERATED",
+              "URL"
+            ],
+            "default": "UPLOAD"
+          }
+        },
+        "required": [
+          "url",
+          "position"
+        ]
+      },
+      "UpdateChapterImageDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Nouvelle URL",
+            "example": "https://cdn.example.com/photo-v2.jpg"
+          },
+          "caption": {
+            "type": "string",
+            "example": "Ma famille en 1990"
+          },
+          "altText": {
+            "type": "string",
+            "example": "Photo de famille"
+          },
+          "position": {
+            "type": "number",
+            "example": 2
+          }
+        }
+      },
+      "CreateSubChapterDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Titre du sous-chapitre",
+            "example": "Le marché de Bouaké"
+          },
+          "position": {
+            "type": "number",
+            "description": "Position dans le chapitre",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "description": "Contenu du sous-chapitre"
+          }
+        },
+        "required": [
+          "title",
+          "position"
+        ]
+      },
+      "UpdateSubChapterDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Le marché de Bouaké"
+          },
+          "position": {
+            "type": "number",
+            "example": 1
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "InviteCollaboratorDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email du collaborateur",
+            "example": "collaborateur@example.com"
+          },
+          "role": {
+            "type": "string",
+            "description": "Rôle accordé",
+            "enum": [
+              "READER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "default": "READER"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "UpdateCollaboratorRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "READER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ]
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "CreateVersionDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Libellé de la version",
+            "example": "Version finale avant relecture"
+          }
+        }
+      },
+      "ExportBookDto": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string",
+            "description": "Format d'export",
+            "enum": [
+              "PDF",
+              "EPUB",
+              "DOCX"
+            ],
+            "example": "PDF"
+          }
+        },
+        "required": [
+          "format"
+        ]
+      },
+      "AddTagsDto": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "description": "Liste des noms de tags",
+            "example": [
+              "mémoire familiale",
+              "histoire orale"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "tags"
+        ]
+      },
+      "AddFavoriteDto": {
+        "type": "object",
+        "properties": {
+          "chapterId": {
+            "type": "string",
+            "description": "ID du chapitre (optionnel)",
+            "example": "clxxx123"
+          },
+          "note": {
+            "type": "string",
+            "description": "Note personnelle",
+            "example": "Passage clé à relire"
+          }
+        }
+      },
+      "CreateAiSuggestionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type de suggestion demandée",
+            "enum": [
+              "BOOK_PLAN",
+              "CHAPTER_DRAFT",
+              "SENTENCE_SUGGESTION",
+              "CORRECTION",
+              "NARRATIVE_ADVICE",
+              "COVER_PROMPT"
+            ],
+            "example": "CHAPTER_DRAFT"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Instruction / prompt envoyé à l'IA",
+            "example": "Rédige une introduction pour un chapitre sur l'enfance en milieu rural en Côte d'Ivoire"
+          },
+          "bookId": {
+            "type": "string",
+            "description": "ID du livre concerné (optionnel)",
+            "example": "clxABC123"
+          },
+          "chapterId": {
+            "type": "string",
+            "description": "ID du chapitre concerné (optionnel)",
+            "example": "clxCH001"
+          }
+        },
+        "required": [
+          "type",
+          "prompt"
+        ]
+      },
+      "AcceptSuggestionDto": {
+        "type": "object",
+        "properties": {
+          "isAccepted": {
+            "type": "boolean",
+            "description": "Accepter ou refuser la suggestion",
+            "example": true
+          }
+        },
+        "required": [
+          "isAccepted"
+        ]
+      },
+      "CreateCoverGenerationDto": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Prompt décrivant la couverture souhaitée",
+            "example": "Une couverture avec un baobab au coucher du soleil sur fond de savane africaine"
+          },
+          "style": {
+            "type": "string",
+            "description": "Style visuel de la couverture",
+            "example": "vintage"
+          }
+        },
+        "required": [
+          "prompt",
+          "style"
+        ]
+      },
+      "CreateMediaProjectDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type de projet multimédia",
+            "enum": [
+              "AUDIO_NARRATION",
+              "VIDEO_STORY"
+            ],
+            "example": "AUDIO_NARRATION"
+          },
+          "title": {
+            "type": "string",
+            "description": "Titre du projet multimédia",
+            "example": "Narration audio — Ma vie en Côte d'Ivoire"
+          },
+          "language": {
+            "type": "string",
+            "description": "Langue de la narration",
+            "example": "fr",
+            "default": "fr"
+          },
+          "voiceGender": {
+            "type": "string",
+            "description": "Genre de la voix de synthèse",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "NEUTRAL"
+            ],
+            "default": "FEMALE"
+          },
+          "voiceId": {
+            "type": "string",
+            "description": "ID de la voix spécifique (ex: ElevenLabs voice ID)",
+            "example": "EXAVITQu4vr4xnSDxMaL"
+          },
+          "musicTrack": {
+            "type": "string",
+            "description": "Piste musicale de fond",
+            "example": "afrobeat-soft"
+          }
+        },
+        "required": [
+          "type",
+          "title"
+        ]
+      },
+      "UpdateMediaProjectDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Narration v2"
+          },
+          "language": {
+            "type": "string",
+            "example": "fr"
+          },
+          "voiceGender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "NEUTRAL"
+            ]
+          },
+          "voiceId": {
+            "type": "string",
+            "example": "EXAVITQu4vr4xnSDxMaL"
+          },
+          "musicTrack": {
+            "type": "string",
+            "example": "afrobeat-soft"
+          }
+        }
+      },
+      "ShippingAddressDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "Kaboré Moussa"
+          },
+          "addressLine1": {
+            "type": "string",
+            "example": "Cocody, Rue des Jardins, Immeuble Palmier"
+          },
+          "addressLine2": {
+            "type": "string",
+            "example": "Appartement 4B"
+          },
+          "city": {
+            "type": "string",
+            "example": "Abidjan"
+          },
+          "region": {
+            "type": "string",
+            "example": "Abidjan"
+          },
+          "countryCode": {
+            "type": "string",
+            "example": "CI"
+          },
+          "postalCode": {
+            "type": "string",
+            "example": "00225"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+2250707000000"
+          }
+        },
+        "required": [
+          "fullName",
+          "addressLine1",
+          "city",
+          "countryCode",
+          "phone"
+        ]
+      },
+      "CreateOrderDto": {
+        "type": "object",
+        "properties": {
+          "bookId": {
+            "type": "string",
+            "description": "ID du livre à imprimer",
+            "example": "clxABC123"
+          },
+          "printFormat": {
+            "type": "string",
+            "description": "Format d'impression",
+            "enum": [
+              "A4",
+              "A5",
+              "POCKET",
+              "SQUARE"
+            ],
+            "default": "A5"
+          },
+          "coverType": {
+            "type": "string",
+            "description": "Type de couverture",
+            "enum": [
+              "PAPERBACK",
+              "HARDCOVER"
+            ],
+            "default": "PAPERBACK"
+          },
+          "copies": {
+            "type": "number",
+            "description": "Nombre d'exemplaires",
+            "example": 2,
+            "minimum": 1,
+            "maximum": 500
+          },
+          "shippingAddress": {
+            "description": "Adresse de livraison complète",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ShippingAddressDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "bookId",
+          "copies",
+          "shippingAddress"
+        ]
+      },
+      "ConfirmPaymentDto": {
+        "type": "object",
+        "properties": {
+          "paymentGateway": {
+            "type": "string",
+            "description": "Passerelle de paiement utilisée",
+            "enum": [
+              "STRIPE",
+              "FLUTTERWAVE",
+              "MOBILE_MONEY"
+            ],
+            "example": "MOBILE_MONEY"
+          },
+          "paymentReference": {
+            "type": "string",
+            "description": "Référence de la transaction",
+            "example": "TXN-2024-00123456"
+          }
+        },
+        "required": [
+          "paymentGateway",
+          "paymentReference"
+        ]
+      },
+      "UpdateOrderStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Nouveau statut",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "PRINTING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED"
+            ],
+            "example": "SHIPPED"
+          },
+          "trackingCode": {
+            "type": "string",
+            "description": "Code de suivi (requis si statut = SHIPPED)",
+            "example": "CI123456789FR"
+          },
+          "note": {
+            "type": "string",
+            "description": "Note interne sur la transition",
+            "example": "Expédié via DHL Express"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CancelOrderDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Raison de l'annulation",
+            "example": "Le client a changé d'adresse"
+          }
+        }
+      },
+      "CreateAnchorDto": {
+        "type": "object",
+        "properties": {
+          "bookIds": {
+            "description": "IDs des livres a ancrer",
+            "example": [
+              "clxBOOK001",
+              "clxBOOK002"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "network": {
+            "type": "string",
+            "description": "Reseau blockchain (BITCOIN_OTS = gratuit via OpenTimestamps)",
+            "enum": [
+              "BITCOIN_OTS",
+              "POLYGON",
+              "ETHEREUM",
+              "BSC",
+              "TEZOS"
+            ],
+            "default": "BITCOIN_OTS"
+          }
+        },
+        "required": [
+          "bookIds"
+        ]
+      },
+      "ConfirmAnchorDto": {
+        "type": "object",
+        "properties": {
+          "txHash": {
+            "type": "string",
+            "description": "Hash de la transaction blockchain"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "BITCOIN_OTS",
+              "POLYGON",
+              "ETHEREUM",
+              "BSC",
+              "TEZOS"
+            ]
+          }
+        },
+        "required": [
+          "txHash"
+        ]
+      },
+      "UpsertWritingStatDto": {
+        "type": "object",
+        "properties": {
+          "bookId": {
+            "type": "string",
+            "description": "ID du livre concerné (optionnel — session globale si absent)",
+            "example": "clxBOOK001"
+          },
+          "date": {
+            "type": "string",
+            "description": "Date de la session (YYYY-MM-DD) — aujourd'hui par défaut",
+            "example": "2025-04-12"
+          },
+          "wordsWritten": {
+            "type": "number",
+            "description": "Nombre de mots écrits durant la session",
+            "example": 350,
+            "minimum": 0
+          },
+          "minutesSpent": {
+            "type": "number",
+            "description": "Temps passé à écrire en minutes",
+            "example": 45,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "wordsWritten",
+          "minutesSpent"
+        ]
+      },
+      "CreateThreadDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "Sujet de la discussion",
+            "example": "Impossible d'exporter mon livre en PDF"
+          },
+          "message": {
+            "type": "string",
+            "description": "Premier message décrivant le problème",
+            "example": "Bonjour, quand je clique sur Exporter en PDF, je reçois une erreur 500..."
+          }
+        },
+        "required": [
+          "subject",
+          "message"
+        ]
+      },
+      "UpdateThreadStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Nouveau statut du thread",
+            "enum": [
+              "OPEN",
+              "IN_PROGRESS",
+              "RESOLVED",
+              "CLOSED"
+            ],
+            "example": "IN_PROGRESS"
+          },
+          "note": {
+            "type": "string",
+            "description": "Note interne sur le changement de statut",
+            "example": "Pris en charge par l'équipe technique"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Contenu du message",
+            "example": "Merci pour votre retour, nous allons investiguer."
+          },
+          "senderType": {
+            "type": "string",
+            "description": "Type d'expéditeur (USER par défaut)",
+            "enum": [
+              "USER",
+              "AGENT",
+              "BOT"
+            ],
+            "default": "USER"
+          },
+          "senderId": {
+            "type": "string",
+            "description": "ID de l'expéditeur (null pour BOT)",
+            "example": "clxAGENT001"
+          }
+        },
+        "required": [
+          "content"
+        ]
+      }
+    }
+  }
+}

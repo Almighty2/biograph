@@ -1,0 +1,919 @@
+// ============================================================
+// BIOGRAF AI — Schema Prisma Complet
+// Nomenclature : snake_case pour les tables, camelCase pour les champs
+// Aucun accent dans les noms de champs, modeles ou enums
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 1. UTILISATEURS & AUTHENTIFICATION
+// ============================================================
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  emailVerified       Boolean   @default(false)
+  passwordHash        String?
+  fullName            String
+  avatarUrl           String?
+  bio                 String?
+  language            String    @default("fr")
+  timezone            String    @default("Africa/Abidjan")
+  plan                Plan      @default(FREE)
+  planExpiresAt       DateTime?
+  code                String?   @unique
+  resetToken          String?   @unique
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+
+  isVerified              Boolean   @default(false)
+  verificationToken       String?   @unique
+  verificationTokenExpiry DateTime?
+
+  // Relations
+  oauthAccounts       OAuthAccount[]
+  books               Book[]
+  collaborations      Collaboration[]
+  notifications       Notification[]
+  writingStats        WritingStat[]
+  orders              Order[]
+  mediaProjects       MediaProject[]
+  supportThreads      SupportThread[]
+  favorites           Favorite[]
+  blockchainAnchors   BlockchainAnchor[]
+  sessions            Session[]
+  writingReminders    WritingReminder[]
+
+  @@map("users")
+}
+
+model Session {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  token           String   @unique
+  userAgent       String?
+  ipAddress       String?
+  expiresAt       DateTime
+  lastUsedAt      DateTime? @default(now())
+  createdAt       DateTime  @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model OAuthAccount {
+  id              String          @id @default(cuid())
+  userId          String
+  provider        OAuthProvider
+  providerAccountId String
+  accessToken     String?
+  refreshToken    String?
+  expiresAt       DateTime?
+  createdAt       DateTime        @default(now())
+
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("oauth_accounts")
+}
+
+// ============================================================
+// 2. LIVRES
+// ============================================================
+
+model Book {
+  id                String      @id @default(cuid())
+  ownerId           String
+  title             String
+  subtitle          String?
+  slug              String      @unique
+  description       String?
+  coverImageUrl     String?
+  coverStyle        String?
+  language          String      @default("fr")
+  genre             BookGenre   @default(AUTOBIOGRAPHY)
+  status            BookStatus  @default(DRAFT)
+  visibility        Visibility  @default(PRIVATE)
+  shareToken        String?     @unique
+  targetWordCount   Int?
+  targetPageCount   Int?
+  wordCount         Int         @default(0)
+  pageCount         Int         @default(0)
+  progressPct       Float       @default(0)
+  isPremium         Boolean     @default(false)
+  blockchainAnchorId String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  publishedAt       DateTime?
+  deletedAt         DateTime?
+
+  // Relations
+  owner             User            @relation(fields: [ownerId], references: [id])
+  chapters          Chapter[]
+  collaborations    Collaboration[]
+  versions          BookVersion[]
+  exports           BookExport[]
+  orders            Order[]
+  tableOfContents   TableOfContents?
+  mediaProjects     MediaProject[]
+  favorites         Favorite[]
+  blockchainAnchor  BlockchainAnchor? @relation(fields: [blockchainAnchorId], references: [id])
+  aiSuggestions     AiSuggestion[]
+  tags              BookTag[]
+
+  @@map("books")
+}
+
+model Chapter {
+  id            String    @id @default(cuid())
+  bookId        String
+  title         String
+  position      Int
+  content       String?
+  wordCount     Int       @default(0)
+  isComplete    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  subChapters   SubChapter[]
+  images        ChapterImage[]
+  aiSuggestions AiSuggestion[]
+
+  @@map("chapters")
+}
+
+model SubChapter {
+  id          String   @id @default(cuid())
+  chapterId   String
+  title       String
+  position    Int
+  content     String?
+  wordCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@map("sub_chapters")
+}
+
+model ChapterImage {
+  id          String      @id @default(cuid())
+  chapterId   String
+  url         String
+  caption     String?
+  altText     String?
+  position    Int
+  source      ImageSource @default(UPLOAD)
+  createdAt   DateTime    @default(now())
+
+  chapter     Chapter     @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@map("chapter_images")
+}
+
+model TableOfContents {
+  id          String   @id @default(cuid())
+  bookId      String   @unique
+  content     Json
+  updatedAt   DateTime @updatedAt
+
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("tables_of_contents")
+}
+
+// ============================================================
+// 3. VERSIONS & HISTORIQUE
+// ============================================================
+
+model BookVersion {
+  id            String   @id @default(cuid())
+  bookId        String
+  versionNumber Int
+  snapshot      Json
+  label         String?
+  createdBy     String
+  createdAt     DateTime @default(now())
+
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, versionNumber])
+  @@map("book_versions")
+}
+
+// ============================================================
+// 4. COLLABORATION
+// ============================================================
+
+model Collaboration {
+  id          String              @id @default(cuid())
+  bookId      String
+  userId      String
+  role        CollaborationRole   @default(READER)
+  invitedBy   String
+  acceptedAt  DateTime?
+  createdAt   DateTime            @default(now())
+
+  book        Book                @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, userId])
+  @@map("collaborations")
+}
+
+// ============================================================
+// 5. EXPORTS
+// ============================================================
+
+model BookExport {
+  id           String       @id @default(cuid())
+  bookId       String
+  format       ExportFormat
+  status       ExportStatus @default(PENDING)
+  fileUrl      String?
+  fileSize     Int?
+  mimeType     String?
+  errorMessage String?
+  completedAt  DateTime?
+  createdAt    DateTime     @default(now())
+
+  book         Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("book_exports")
+}
+enum ExportFormat { 
+  PDF 
+  EPUB 
+  DOCX 
+}
+
+enum ExportStatus { 
+  PENDING 
+  PROCESSING 
+  DONE 
+  FAILED 
+}
+
+// ============================================================
+// 6. IA — SUGGESTIONS & GENERATION
+// ============================================================
+
+model AiSuggestion {
+  id          String              @id @default(cuid())
+  bookId      String?
+  chapterId   String?
+  type        AiSuggestionType
+  prompt      String
+  response    String
+  isAccepted  Boolean?
+  createdAt   DateTime            @default(now())
+
+  book        Book?               @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  chapter     Chapter?            @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  @@map("ai_suggestions")
+}
+
+model CoverGeneration {
+  id              String   @id @default(cuid())
+  bookId          String
+  prompt          String
+  style           String
+  imageUrl        String
+  isSelected      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@map("cover_generations")
+}
+
+// ============================================================
+// 7. MULTIMEDIA (VIDEO & AUDIO)
+// ============================================================
+
+model MediaProject {
+  id            String        @id @default(cuid())
+  bookId        String
+  ownerId       String
+  type          MediaType
+  title         String
+  language      String        @default("fr")
+  voiceGender   VoiceGender   @default(FEMALE)
+  voiceId       String?
+  musicTrack    String?
+  status        TaskStatus    @default(PENDING)
+  fileUrl       String?
+  durationSec   Int?
+  error         String?
+  createdAt     DateTime      @default(now())
+  completedAt   DateTime?
+  fileSize     Int?
+
+  book          Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  owner         User          @relation(fields: [ownerId], references: [id])
+
+  @@map("media_projects")
+}
+
+// ============================================================
+// 8. IMPRESSIONS & COMMANDES
+// ============================================================
+
+model Order {
+  id                  String            @id @default(cuid())
+  userId              String
+  bookId              String
+  status              OrderStatus       @default(PENDING)
+  printFormat         PrintFormat       @default(A5)
+  coverType           CoverType         @default(PAPERBACK)
+  copies              Int               @default(1)
+  pageCount           Int
+  unitPriceCents      Int
+  totalCents          Int
+  currency            String            @default("XOF")
+  shippingAddress     Json
+  trackingCode        String?
+  paymentReference    String?
+  paymentGateway      PaymentGateway?
+  paidAt              DateTime?
+  shippedAt           DateTime?
+  deliveredAt         DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  user                User              @relation(fields: [userId], references: [id])
+  book                Book              @relation(fields: [bookId], references: [id])
+  events              OrderEvent[]
+
+  @@map("orders")
+}
+
+model OrderEvent {
+  id          String      @id @default(cuid())
+  orderId     String
+  status      OrderStatus
+  note        String?
+  createdAt   DateTime    @default(now())
+
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_events")
+}
+
+// ============================================================
+// 9. BLOCKCHAIN (ARCHIVAGE OPTIONNEL)
+// ============================================================
+
+model BlockchainAnchor {
+  id              String             @id @default(cuid())
+  userId          String
+  contentHash     String             @unique
+  network         BlockchainNetwork  @default(BITCOIN_OTS)
+
+  // Statut
+  isConfirmed     Boolean            @default(false)
+  errorMessage    String?
+
+  // Dates
+  anchoredAt      DateTime?
+  confirmedAt     DateTime?
+
+  // Bitcoin via OpenTimestamps
+  otsProof        String?            @db.Text   // base64 du fichier .ots
+  bitcoinHeight   Int?
+  bitcoinTime     DateTime?
+
+  // Transaction (toutes blockchains)
+  txHash          String?
+
+  user            User               @relation(fields: [userId], references: [id])
+  books           Book[]
+
+  createdAt       DateTime           @default(now())
+
+  @@map("blockchain_anchors")
+}
+
+enum BlockchainNetwork {
+  BITCOIN_OTS    // OpenTimestamps gratuit (recommande)
+  POLYGON
+  ETHEREUM
+  BSC
+  TEZOS
+}
+
+// ============================================================
+// 10. NOTIFICATIONS & RAPPELS
+// ============================================================
+
+model Notification {
+  id          String              @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  body        String
+  isRead      Boolean             @default(false)
+  data        Json?
+  createdAt   DateTime            @default(now())
+
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model WritingReminder {
+  id            String          @id @default(cuid())
+  userId        String
+  bookId        String?
+  frequency     ReminderFrequency @default(DAILY)
+  time          String
+  isActive      Boolean         @default(true)
+  lastSentAt    DateTime?
+  createdAt     DateTime        @default(now())
+
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("writing_reminders")
+}
+
+// ============================================================
+// 11. STATISTIQUES D'ECRITURE
+// ============================================================
+
+model WritingStat {
+  id              String   @id @default(cuid())
+  userId          String
+  bookId          String?
+  date            DateTime @db.Date
+  wordsWritten    Int      @default(0)
+  minutesSpent    Int      @default(0)
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId, date])
+  @@map("writing_stats")
+}
+
+// ============================================================
+// 12. SUPPORT
+// ============================================================
+
+model SupportThread {
+  id          String          @id @default(cuid())
+  userId      String
+  subject     String
+  status      SupportStatus   @default(OPEN)
+  createdAt   DateTime        @default(now())
+  closedAt    DateTime?
+
+  user        User            @relation(fields: [userId], references: [id])
+  messages    SupportMessage[]
+
+  @@map("support_threads")
+}
+
+model SupportMessage {
+  id          String          @id @default(cuid())
+  threadId    String
+  senderType  SenderType
+  senderId    String?
+  content     String
+  createdAt   DateTime        @default(now())
+
+  thread      SupportThread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("support_messages")
+}
+
+// ============================================================
+// 13. ETIQUETTES & FAVORIS
+// ============================================================
+
+model Tag {
+  id      String    @id @default(cuid())
+  name    String    @unique
+
+  books   BookTag[]
+
+  @@map("tags")
+}
+
+model BookTag {
+  bookId  String
+  tagId   String
+
+  book    Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([bookId, tagId])
+  @@map("book_tags")
+}
+
+model Favorite {
+  id          String   @id @default(cuid())
+  userId      String
+  bookId      String
+  chapterId   String?
+  note        String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId, chapterId])
+  @@map("favorites")
+}
+
+// ============================================================
+// ENUMERATIONS
+// ============================================================
+
+enum Plan {
+  FREE
+  PRO
+  TEAM
+  ENTERPRISE
+}
+
+enum OAuthProvider {
+  GOOGLE
+  FACEBOOK
+  APPLE
+}
+
+enum BookGenre {
+  AUTOBIOGRAPHY
+  BIOGRAPHY
+  FAMILY_ARCHIVE
+  COMMUNITY_HISTORY
+  MEMOIR
+  OTHER
+}
+
+enum BookStatus {
+  DRAFT
+  IN_PROGRESS
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Visibility {
+  PRIVATE
+  RESTRICTED
+  PUBLIC
+}
+
+enum CollaborationRole {
+  READER
+  COMMENTER
+  EDITOR
+  ADMIN
+}
+
+enum ImageSource {
+  UPLOAD
+  AI_GENERATED
+  URL
+}
+
+enum AiSuggestionType {
+  BOOK_PLAN
+  CHAPTER_DRAFT
+  SENTENCE_SUGGESTION
+  CORRECTION
+  NARRATIVE_ADVICE
+  COVER_PROMPT
+}
+
+enum MediaType {
+  AUDIO_NARRATION
+  VIDEO_STORY
+}
+
+enum VoiceGender {
+  MALE
+  FEMALE
+  NEUTRAL
+}
+
+enum TaskStatus {
+  PENDING
+  PROCESSING
+  DONE
+  FAILED
+}
+
+enum PrintFormat {
+  A4
+  A5
+  POCKET
+  SQUARE
+}
+
+enum CoverType {
+  PAPERBACK
+  HARDCOVER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PRINTING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentGateway {
+  STRIPE
+  FLUTTERWAVE
+  MOBILE_MONEY
+}
+
+enum NotificationType {
+  WRITING_REMINDER
+  COLLABORATION_INVITE
+  ORDER_UPDATE
+  AI_SUGGESTION
+  SYSTEM
+}
+
+enum ReminderFrequency {
+  DAILY
+  EVERY_2_DAYS
+  WEEKLY
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum SenderType {
+  USER
+  AGENT
+  BOT
+}
+/* UTILISATEUR
+    │
+    ├──→ LIVRE ──→ CHAPITRE ──→ SOUS_CHAPITRE
+    │       │         │
+    │       │         └──→ IMAGE_CHAPITRE
+    │       │
+    │       ├──→ VERSION_LIVRE (historique)
+    │       ├──→ COLLABORATION (partage)
+    │       ├──→ EXPORT_LIVRE (PDF/EPUB)
+    │       ├──→ SUGGESTION_IA
+    │       ├──→ PROJET_MULTIMEDIA (audio/vidéo)
+    │       ├──→ COMMANDE (impression)
+    │       │       └──→ EVENEMENT_COMMANDE
+    │       └──→ ETIQUETTE (tags)
+    │
+    ├──→ SESSION (connexion)
+    ├──→ COMPTE_OAUTH (login externe)
+    ├──→ NOTIFICATION
+    ├──→ RAPPEL_ECRITURE
+    ├──→ STATISTIQUE_ECRITURE
+    ├──→ DISCUSSION_SUPPORT
+    │       └──→ MESSAGE_SUPPORT
+    ├──→ FAVORI
+    └──→ ANCRE_BLOCKCHAIN */
+
+ /*    Explication détaillée du rôle de chaque table - Biograf AI
+Voici une explication claire du rôle de chaque table dans ton projet Biograf AI, organisée par module fonctionnel.
+
+📦 MODULE 1 : UTILISATEURS & AUTHENTIFICATION
+Utilisateur (Cœur du système)
+Rôle : Table centrale qui stocke tous les comptes utilisateurs.
+
+Contient les infos personnelles (nom, email, mot de passe hashé)
+
+Gère les forfaits (GRATUIT/PRO/ÉQUIPE/ENTREPRISE)
+
+Suit les dates clés (création, mise à jour, suppression)
+
+Relation : reliée à presque toutes les autres tables
+
+Session
+Rôle : Gère les sessions actives des utilisateurs connectés.
+
+Stocke le jeton d'authentification unique
+
+Enregistre le navigateur et l'adresse IP pour la sécurité
+
+Permet la déconnexion automatique via expireLe
+
+CompteOAuth
+Rôle : Gère les connexions via des fournisseurs tiers (Google, Facebook, Apple).
+
+Permet à l'utilisateur de se connecter sans mot de passe
+
+Stocke les tokens d'accès pour les API externes
+
+📚 MODULE 2 : LIVRES & STRUCTURE D'ÉCRITURE
+Livre
+Rôle : Table centrale du contenu - représente un livre biographique.
+
+Stocke les métadonnées (titre, description, genre, langue)
+
+Suit la progression (nombre de mots/pages, pourcentage)
+
+Gère la visibilité (privé/restreint/public)
+
+Contient le slug pour les URLs SEO-friendly
+
+Chapitre
+Rôle : Représente un chapitre principal d'un livre.
+
+Lié à un livre spécifique
+
+Contient le contenu rédigé
+
+Suit la position dans l'ordre du livre
+
+SousChapitre
+Rôle : Sous-division d'un chapitre pour plus de granularité.
+
+Permet une structure hiérarchique plus riche
+
+Utile pour organiser des récits complexes
+
+ImageChapitre
+Rôle : Gère les images insérées dans les chapitres.
+
+Stocke l'URL, la légende, le texte alternatif (accessibilité)
+
+Sait si l'image a été téléchargée ou générée par IA
+
+TableDesMatieres
+Rôle : Génère automatiquement la table des matières.
+
+Stocke une structure JSON complète du plan du livre
+
+Mise à jour automatique quand les chapitres changent
+
+📜 MODULE 3 : VERSIONS & HISTORIQUE
+VersionLivre
+Rôle : Sauvegarde l'historique complet des modifications.
+
+Capture un snapshot JSON complet du livre à un moment T
+
+Permet la restauration à une version antérieure
+
+Chaque version est numérotée (numeroVersion)
+
+👥 MODULE 4 : COLLABORATION
+Collaboration
+Rôle : Gère le travail à plusieurs sur un même livre.
+
+Définit les permissions (lecteur/commentateur/éditeur/admin)
+
+Enregistre qui a invité qui
+
+S'assure qu'un utilisateur n'est invité qu'une fois par livre
+
+📤 MODULE 5 : EXPORTS
+ExportLivre
+Rôle : Gère la génération des fichiers d'export.
+
+Supporte PDF, EPUB, DOCX
+
+Suit le statut de la tâche (en attente/traitement/terminé/échoué)
+
+Stocke l'URL du fichier généré
+
+🤖 MODULE 6 : IA & GÉNÉRATION
+SuggestionIA
+Rôle : Stocke toutes les suggestions générées par l'IA.
+
+Types : plan de livre, projet de chapitre, correction, conseil narration...
+
+Enregistre si l'utilisateur a accepté ou non la suggestion
+
+GenerationCouverture
+Rôle : Gère les couvertures générées par IA.
+
+Stocke plusieurs propositions par livre
+
+Une seule peut être marquée comme sélectionnée
+
+🎬 MODULE 7 : MULTIMÉDIA
+ProjetMultimedia
+Rôle : Gère la génération de contenu audio et vidéo.
+
+Types : narration audio, vidéo d'histoire
+
+Paramètres : langue, genre de voix, musique de fond
+
+Suit le statut de génération (en attente/traitement/terminé/échoué)
+
+💳 MODULE 8 : IMPRESSIONS & COMMANDES
+Commande
+Rôle : Gère les commandes d'impression physique.
+
+Stocke le format (A4/A5/poche/carré)
+
+Type de couverture (broché/rigide)
+
+Nombre d'exemplaires, prix calculé
+
+Suivi de livraison (code de suivi, transporteur)
+
+EvenementCommande
+Rôle : Historique des changements de statut d'une commande.
+
+Trace chaque étape (confirmée/en_impression/expédiée/livrée)
+
+Permet un audit complet du cycle de vie
+
+⛓️ MODULE 9 : BLOCKCHAIN
+AncreBlockchain
+Rôle : Archivage sécurisé et preuve de propriété.
+
+Stocke le hash cryptographique du contenu
+
+Contient la transaction blockchain pour preuve d'antériorité
+
+Optionnel mais crucial pour la protection du patrimoine
+
+🔔 MODULE 10 : NOTIFICATIONS & RAPPELS
+Notification
+Rôle : Envoie des alertes aux utilisateurs.
+
+Types : rappel écriture, invitation collaboration, suivi commande...
+
+Suit si la notification a été lue
+
+RappelEcriture
+Rôle : Gère les rappels personnalisés pour encourager l'écriture.
+
+Fréquence configurable (quotidienne/2 jours/hebdomadaire)
+
+Heure personnalisée
+
+Peut être activé/désactivé
+
+📊 MODULE 11 : STATISTIQUES
+StatistiqueEcriture
+Rôle : Suivi détaillé de l'activité d'écriture.
+
+Compte les mots écrits par jour
+
+Mesure le temps passé
+
+Permet des graphiques de progression
+
+💬 MODULE 12 : SUPPORT
+DiscussionSupport
+Rôle : Gère les conversations de support client.
+
+Crée un ticket par problème
+
+Suit le statut (ouverte/en cours/résolue/fermée)
+
+MessageSupport
+Rôle : Stocke chaque message dans une discussion.
+
+Identifie l'envoyeur (utilisateur/agent/bot)
+
+Permet un historique complet des échanges
+
+🏷️ MODULE 13 : ÉTIQUETTES & FAVORIS
+Etiquette
+Rôle : Système de tags pour classer les livres.
+
+Permet une recherche par catégorie
+
+Exemples : "mémoire familiale", "histoire orale", "patrimoine"
+
+EtiquetteLivre
+Rôle : Table de liaison entre livres et étiquettes.
+
+Relation many-to-many
+
+Un livre peut avoir plusieurs étiquettes
+
+Favori
+Rôle : Permet aux utilisateurs de marquer des passages importants.
+
+Note personnelle associée
+
+Utile pour retrouver des moments clés d'un livre
+
+ */

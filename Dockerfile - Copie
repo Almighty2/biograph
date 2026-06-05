@@ -1,0 +1,17 @@
+FROM node:18
+
+# Crée un dossier de travail dans le conteneur
+WORKDIR /app
+
+# Copie package.json & lock, puis installe les dépendances
+COPY package*.json ./
+RUN npm install --production
+
+# Copie le reste du code
+COPY . .
+
+# Compile le projet
+RUN npm run build
+
+# Commande de démarrage
+CMD ["node", "dist/main"]
