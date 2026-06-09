@@ -299,7 +299,7 @@ export class UtilisateurService {
       type: 'create_account',
       prenom,
       nom,
-      actionUrl: `${process.env.FRONTEND_URL}/verify-account?token=${token}`,
+      actionUrl: `${process.env.FRONTEND_URL}/users/verify-account?token=${token}`,
     });
 
     await this.notificationService.sendMail(user.email, subject, html);
