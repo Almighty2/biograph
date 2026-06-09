@@ -28,6 +28,7 @@ export class UtilisateurService {
   // ─── Inscription ──────────────────────────────────────────────────────────
 
   async create(dto: CreateUserDto) {
+    const BASE_URL = 'https://biograph-3.onrender.com/api/v1';
     const existing = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -66,7 +67,7 @@ export class UtilisateurService {
       type: 'create_account',
       prenom,
       nom,
-      actionUrl: `${process.env.FRONTEND_URL}/verify-account?token=${token}`,
+      actionUrl: `${BASE_URL}/verify-account?token=${token}`,
     });
 
     await this.notificationService.sendMail(user.email, subject, html);
@@ -214,7 +215,7 @@ export class UtilisateurService {
       type: 'reset_password',
       prenom,
       nom,
-      actionUrl: `${process.env.FRONTEND_URL}/reset-password?token=${token}`, // ✅ backticks
+      actionUrl: `${process.env.FRONTEND_URL}/users/reset-password?token=${token}`, // ✅ backticks
     });
 
   await this.notificationService.sendMail(user.email, subject, html);
